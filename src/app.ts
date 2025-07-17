@@ -15,6 +15,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(corsMiddleware);
 
+app.get('/', (req, res) => res.status(200).json({ status: 'success', message: 'Welcome to API Seraloka' }))
+
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/admin', adminRoutes); // Daftarkan rute admin
 
