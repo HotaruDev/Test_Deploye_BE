@@ -1,0 +1,289 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Seraloka API Documentation",
+    "version": "1.0.0",
+    "description": "Dokumentasi API untuk aplikasi Seraloka"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000/api/v1",
+      "description": "Development server"
+    }
+  ],
+  "components": {
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "uuid": {
+            "type": "string",
+            "format": "uuid",
+            "description": "UUID unik pengguna",
+            "example": "some-uuid-string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Alamat email pengguna",
+            "example": "user@example.com"
+          },
+          "password_hash": {
+            "type": "string",
+            "description": "Hash kata sandi pengguna",
+            "example": "hashedpassword123"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "USER",
+              "ADMIN"
+            ],
+            "description": "Peran pengguna",
+            "example": "USER"
+          },
+          "is_active": {
+            "type": "boolean",
+            "description": "Status aktif pengguna",
+            "example": true
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Tanggal pembuatan pengguna"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Tanggal pembaruan terakhir pengguna"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "Pesan kesalahan",
+            "example": "Terjadi kesalahan internal server"
+          }
+        }
+      },
+      "UserRegisterRequest": {
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Email pengguna untuk pendaftaran",
+            "example": "newuser@example.com"
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "description": "Kata sandi pengguna untuk pendaftaran",
+            "example": "securepassword"
+          }
+        }
+      },
+      "UserLoginRequest": {
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "description": "Email pengguna untuk login",
+            "example": "user@example.com"
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "description": "Kata sandi pengguna untuk login",
+            "example": "password123"
+          }
+        }
+      },
+      "UserRegisteredSuccess": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "User registered successfully"
+          }
+        }
+      },
+      "UserLoginSuccess": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Login successful"
+          },
+          "token": {
+            "type": "string",
+            "description": "Token otentikasi JWT",
+            "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "summary": "Mendaftarkan pengguna baru",
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserRegisterRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Pengguna berhasil didaftarkan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserRegisteredSuccess"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Input tidak valid atau pengguna sudah ada",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "summary": "Login pengguna",
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserLoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login berhasil",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserLoginSuccess"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Kredensial tidak valid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/verify-email": {
+      "get": {
+        "summary": "Memverifikasi email pengguna dengan token",
+        "tags": [
+          "Auth"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "token",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Token verifikasi email"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Email berhasil diverifikasi",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "Email verified successfully!"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Token verifikasi diperlukan atau tautan sudah kedaluwarsa",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Tautan verifikasi tidak valid atau pengguna tidak ditemukan",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Kesalahan internal server",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "tags": []
+}

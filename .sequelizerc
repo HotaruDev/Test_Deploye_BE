@@ -1,0 +1,8 @@
+const path = require('path');
+
+module.exports = {
+  'config': path.resolve(__dirname, 'config', 'config.js'),
+  'models-path': path.resolve(__dirname, 'src', 'models'), // Model tetap di src jika Anda menggunakannya di seeder/migrasi
+  'seeders-path': path.resolve(__dirname, 'dist', 'seeders'), // <-- Ubah ke dist/seeders
+  'migrations-path': path.resolve(__dirname, 'migrations') // Tetap di migrations di root
+};
